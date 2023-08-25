@@ -1,0 +1,5 @@
+{:paths   ["src"]
+ :deps    {org.clojure/clojure {:mvn/version "1.11.1"}
+           hiccup/hiccup       {:mvn/version "1.0.5"}
+           medley/medley       {:mvn/version "1.4.0"}}
+ :aliases {:run {:main-opts ["-m" "openrpa-activities-doc.core"]}}}

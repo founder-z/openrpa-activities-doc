@@ -1,0 +1,33 @@
+name: Build and Deploy
+on: [push]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Prepare java
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 17
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@11.0
+        with:
+          cli: 1.10.1.693
+
+      - name: Build
+        run: clojure -M:run
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build

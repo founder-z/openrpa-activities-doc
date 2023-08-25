@@ -1,0 +1,3 @@
+[submodule "openrpa"]
+	path = openrpa
+	url = https://github.com/open-rpa/openrpa.git
