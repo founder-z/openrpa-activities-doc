@@ -95,6 +95,31 @@
     new-bitmap))
 
 
+
+(comment
+  (def classes
+    (->> (file-seq (io/file "openrpa"))
+         (filter #(and (re-matches #".+/Activities/[^.]+.cs" (str %))
+                       (re-find #"public class [ \w:.,<>]+Activity" (slurp %))))
+         (mapcat parse-file)
+         (flatten-classes))))
+
+
+(def link-svg
+  [:svg
+   {:xmlns "http://www.w3.org/2000/svg"
+    :viewBox "0 0 24 24"
+    :fill "none"
+    :stroke "currentColor"
+    :stroke-width "2"
+    :stroke-linecap "round"
+    :stroke-linejoin "round"
+    :class "w-4"}
+   [:path {:d "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"}]
+   [:path {:d "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"}]])
+
+
+
 (defn render
   [classes]
   (.mkdir (io/file "build"))
@@ -114,18 +139,23 @@
                 (->> (group-by :namespace classes)
                      (map (fn [[namespace classes]]
                             [:div {:class "space-y-8"}
-                             [:h2 {:class "text-3xl font-medium text-cyan-700"} namespace]
+                             [:h2 {:class "group relative text-3xl font-medium text-cyan-700" :id namespace}
+                              [:a {:class "text-cyan-600 absolute invisible group-hover:visible p-2 right-full top-1/2 transform -translate-y-1/2" :href (str "#" namespace)}
+                               link-svg]
+                              namespace]
                              [:div {:class "space-y-8 pl-4"}
                               (->> classes
                                    (map (fn [class]
                                           (let [localize #(or (get-in class [:strings locale %])
                                                               (get-in class [:strings :en %]))]
                                             [:div {:class "space-y-4"}
-                                             [:div {:class "flex gap-2 items-center border-b border-slate-200"}
+                                             [:div {:class "relative group flex gap-2 items-center border-b border-slate-200"}
+                                              [:a {:class "text-cyan-600 absolute invisible group-hover:visible p-2 right-full top-1/2 transform -translate-y-1/2" :href (str "#" namespace "." (:name class))}
+                                               link-svg]
                                               (if-let [bitmap (get-in class [:annotations :bitmap])]
                                                 [:img {:width 16 :src (copy-bitmap bitmap namespace)}]
                                                 [:div {:class "w-4 h-4 rounded-full bg-orange-500 text-orange-100 text-xs grid place-items-center"} "?"])
-                                              [:div {:class "text-lg font-medium text-cyan-700"} (:name class)]
+                                              [:h3 {:class "text-lg font-medium text-cyan-700" :id (str namespace "." (:name class))} (:name class)]
                                               (when-let [url (localize (get-in class [:annotations :help-url]))]
                                                 [:a {:class "text-cyan-600 text-sm" :href url :target "_blank"} "↗"])]
                                              (when-let [tooltip (localize (get-in class [:annotations :tooltip]))]
