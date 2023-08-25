@@ -130,7 +130,9 @@
               [:head
                [:script {:src "https://cdn.tailwindcss.com"}]]
               [:body {:class "container mx-auto p-4 text-slate-800"}
-               [:div {:class "flex justify-end gap-2"}
+               [:div {:class "flex justify-end gap-2 items-center"}
+                (let [ref (slurp ".git/modules/openrpa/HEAD")]
+                  [:a {:class "text-sm text-slate-400 mr-4 hover:text-cyan-600" :href (str "https://github.com/open-rpa/openrpa/tree/" ref)} (str "ver: " (subs ref 0 7))])
                 (for [[l l-suffix] locales]
                   [:a {:class (str "px-2 py-1 rounded border border-transparent hover:border-slate-100 text-cyan-600"
                                    (when (= l locale) " bg-slate-100"))
